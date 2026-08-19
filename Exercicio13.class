@@ -1,0 +1,66 @@
+// Source code is decompiled from a .class file using FernFlower decompiler (from Intellij IDEA).
+import java.util.Arrays;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.RecursiveAction;
+
+public class Exercicio13 {
+   public Exercicio13() {
+   }
+
+   public static void main(String[] var0) {
+      int[] var1 = new int[]{38, 27, 43, 3, 9, 82, 10, 19, 50, 1};
+      System.out.println("Original: " + Arrays.toString(var1));
+      ForkJoinPool var2 = new ForkJoinPool();
+      var2.invoke(new MergeSortTask(var1, 0, var1.length - 1));
+      var2.shutdown();
+      System.out.println("Ordenado: " + Arrays.toString(var1));
+   }
+
+   static class MergeSortTask extends RecursiveAction {
+      private int[] array;
+      private int esquerda;
+      private int direita;
+
+      public MergeSortTask(int[] var1, int var2, int var3) {
+         this.array = var1;
+         this.esquerda = var2;
+         this.direita = var3;
+      }
+
+      protected void compute() {
+         if (this.esquerda < this.direita) {
+            int var1 = (this.esquerda + this.direita) / 2;
+            MergeSortTask var2 = new MergeSortTask(this.array, this.esquerda, var1);
+            MergeSortTask var3 = new MergeSortTask(this.array, var1 + 1, this.direita);
+            invokeAll(var2, var3);
+            this.merge(this.array, this.esquerda, var1, this.direita);
+         }
+
+      }
+
+      private void merge(int[] var1, int var2, int var3, int var4) {
+         int[] var5 = new int[var4 - var2 + 1];
+         int var6 = var2;
+         int var7 = var3 + 1;
+         int var8 = 0;
+
+         while(var6 <= var3 && var7 <= var4) {
+            if (var1[var6] <= var1[var7]) {
+               var5[var8++] = var1[var6++];
+            } else {
+               var5[var8++] = var1[var7++];
+            }
+         }
+
+         while(var6 <= var3) {
+            var5[var8++] = var1[var6++];
+         }
+
+         while(var7 <= var4) {
+            var5[var8++] = var1[var7++];
+         }
+
+         System.arraycopy(var5, 0, var1, var2, var5.length);
+      }
+   }
+}
